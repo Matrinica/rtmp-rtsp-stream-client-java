@@ -57,6 +57,7 @@ public class Camera2ApiManager extends CameraDevice.StateCallback {
   private CameraDevice cameraDevice;
   private SurfaceView surfaceView;
   private TextureView textureView;
+  private SurfaceTexture surfaceTexture;
   private Surface surfaceEncoder; //input surfaceEncoder from videoEncoder
   private CameraManager cameraManager;
   private Handler cameraHandler;
@@ -103,6 +104,12 @@ public class Camera2ApiManager extends CameraDevice.StateCallback {
 
   public void prepareCamera(Surface surface, int fps) {
     this.surfaceEncoder = surface;
+    this.fps = fps;
+    prepared = true;
+  }
+
+  public void prepareCamera(SurfaceTexture surfaceTexture, int fps) {
+    this.surfaceTexture = surfaceTexture;
     this.fps = fps;
     prepared = true;
   }
@@ -164,7 +171,9 @@ public class Camera2ApiManager extends CameraDevice.StateCallback {
 
   private Surface addPreviewSurface() {
     Surface surface = null;
-    if (surfaceView != null) {
+    if (surfaceTexture != null) {
+      surface = new Surface(surfaceTexture);
+    } else if (surfaceView != null) {
       surface = surfaceView.getHolder().getSurface();
     } else if (textureView != null) {
       final SurfaceTexture texture = textureView.getSurfaceTexture();
@@ -296,7 +305,7 @@ public class Camera2ApiManager extends CameraDevice.StateCallback {
    */
   public void openCameraFacing(Facing selectedCameraFacing) {
     try {
-      String cameraId = getCameraIdForFacing(cameraManager, selectedCameraFacing);
+      String cameraId = getCameraIdForFacing(selectedCameraFacing);
       if (cameraId != null) {
         openCameraId(Integer.valueOf(cameraId));
       } else {
@@ -703,6 +712,11 @@ public class Camera2ApiManager extends CameraDevice.StateCallback {
     semaphore.release();
     if (cameraCallbacks != null) cameraCallbacks.onCameraError("Open camera failed: " + i);
     Log.e(TAG, "Open failed");
+  }
+
+  @Nullable
+  public String getCameraIdForFacing(Facing facing) throws CameraAccessException {
+    return getCameraIdForFacing(cameraManager, facing);
   }
 
   @Nullable

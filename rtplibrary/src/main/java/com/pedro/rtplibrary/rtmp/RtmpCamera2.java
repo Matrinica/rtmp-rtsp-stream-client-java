@@ -1,6 +1,7 @@
 package com.pedro.rtplibrary.rtmp;
 
 import android.content.Context;
+import android.graphics.SurfaceTexture;
 import android.media.MediaCodec;
 import android.os.Build;
 import androidx.annotation.RequiresApi;
@@ -60,7 +61,11 @@ public class RtmpCamera2 extends Camera2Base {
   }
 
   public RtmpCamera2(Context context, boolean useOpengl, ConnectCheckerRtmp connectChecker) {
-    super(context, useOpengl);
+    this(null, context, useOpengl, connectChecker);
+  }
+
+  public RtmpCamera2(SurfaceTexture surfaceTexture, Context context, boolean useOpengl, ConnectCheckerRtmp connectChecker) {
+    super(surfaceTexture, context, useOpengl);
     srsFlvMuxer = new SrsFlvMuxer(connectChecker);
   }
 
